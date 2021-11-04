@@ -12,10 +12,6 @@ migrate = Migrate(app, db)
 
 app.register_blueprint(user_bp, url_prefix='/users')
 
-@app.route('/')
-def index():
-  return {"message": "test"}
-
 if __name__ == '__main__':
   app.debug = True
   app.run()

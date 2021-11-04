@@ -11,7 +11,17 @@ def list():
     return {"user": "ana"}
 
 def insert():
-  user = request.json
-  print(user['user'])
+  body = request.json
+
+  user = User(
+    user=body['user'], 
+    document=body['document'],
+    email=body['email'],
+    password=body['password'],
+    enabled=True
+  )
+
+  db.session.add(user)
+  db.session.commit()
   
   return {"message": "success"}
