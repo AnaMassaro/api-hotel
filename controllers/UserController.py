@@ -1,27 +1,104 @@
-from models.User import User
 from flask_sqlalchemy import SQLAlchemy
-from flask import request
+from flask import request, jsonify
 
-from models.User import User
+from models.models import User
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 
 db = SQLAlchemy()
-
-def list():
-    return {"user": "ana"}
 
 def insert():
   body = request.json
 
-  user = User(
-    user=body['user'], 
-    document=body['document'],
-    email=body['email'],
-    password=body['password'],
-    enabled=True
-  )
+  try:
+    user = User(
+      user=body['name'], 
+      document=body['document'],
+      email=body['email'],
+      password=body['password'],
+      enabled=True
+    )
 
-  db.session.add(user)
-  db.session.commit()
+    db.session.add(user)
+    db.session.commit()
+
+  except IntegrityError:
+    db.session.rollback()
+    return {"message": "This member already exists"}, 400
   
-  return {"message": "success"}
+  return {"message": "success"}, 200
+
+def update():
+  id = request.args.get('id')
+  
+  if not id:
+    return {"message": "Invalid parameters"}, 400
+
+  body = request.json
+  try:
+    user = User.query.filter_by(id=id).first()
+
+    user.user = body['user']
+    user.email = body['email']
+    user.password = body['password']
+
+    db.session.merge(user)
+    db.session.commit()
+
+    msg = "success"
+    status = 200
+  except Exception as e:
+    msg = "Failed to update"
+    status = 400
+
+  return {"message": msg}, status
+
+def disable():
+  id = request.args.get('id')
+
+  if not id:
+    return {"message": "Invalid parameters"}, 400
+
+  try:
+    user = User.query.filter_by(id=id).first()
+
+    user.enabled = False
+
+    db.session.merge(user)
+    db.session.commit()
+
+    msg = "success"
+    status = 200
+  except Exception as e:
+    msg = "Failed to disable"
+    status = 400
+
+  return {"message": msg}, status
+
+def list():
+  id = request.args.get('id')
+  rjson = []
+
+  if not id:
+    users = User.query.filter_by(enabled=True).all()
+
+    for user in users:
+      rjson.append({
+        "id": user.id,
+        "name": user.user,
+        "document": user.document,
+        "email": user.email,
+        "password": user.password
+      })
+  else:
+    users = User.query.filter_by(id=id).first()
+    rjson.append({
+      "id": users.id,
+      "name": users.user,
+      "document": users.document,
+      "email": users.email,
+      "password": users.password
+    })
+
+  return jsonify(rjson), 200
+  
