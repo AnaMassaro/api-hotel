@@ -1,11 +1,7 @@
-## Como rodar esse projeto
+## Como instalar as dependências
 
 ```sh
-set FLASK_APP=app.py
-set FLASK_ENV=development
-set FLASK_DEBUG=True
-
-flask run
+pip install -r requirements.txt
 ```
 
 ## Como fazer as migrações
@@ -14,4 +10,14 @@ flask run
 flask db init
 flask db migrate
 flask db upgrade
+```
+
+## Como rodar esse projeto
+
+```sh
+set FLASK_APP=app.py
+set FLASK_ENV=development
+set FLASK_DEBUG=True
+
+flask run
 ```
