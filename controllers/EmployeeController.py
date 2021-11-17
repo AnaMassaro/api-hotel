@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from flask import request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from models.models import Employee
 
@@ -17,7 +18,7 @@ def insert():
       telephone=body['telephone'],
       role=body['role'],
       access=body['access'],
-      password=body['password'],
+      password=generate_password_hash(body['password'], method='sha256'),
       enabled=True
     )
 
@@ -45,7 +46,7 @@ def update():
     employee.telephone = body['telephone']
     employee.role = body['role']
     employee.access = body['access']
-    employee.password = body['password']
+    employee.password = generate_password_hash(body['password'], method='sha256')
 
     db.session.merge(employee)
     db.session.commit()
@@ -97,7 +98,6 @@ def list():
           "telephone": employee.telephone,
           "role": employee.role,
           "access": employee.access,
-          "password": employee.password,
         })
     else:
       employee = Employee.query.filter_by(id=id).first()
@@ -109,9 +109,31 @@ def list():
           "telephone": employee.telephone,
           "role": employee.role,
           "access": employee.access,
-          "password": employee.password,
       })
 
     return jsonify(rjson), 200
   except Exception as e:
     return {"message": "Failed to list"}, 400
+
+def login():
+  body = request.json
+
+  email = body['email']
+  password = body['password']
+
+  employee = Employee.query.filter_by(email=email).first()
+
+  if not employee or not check_password_hash(employee.password, password):
+    return {"message": "Failed to login"}, 400
+
+  rjson = {
+    "id": employee.id,
+    "name": employee.name,
+    "document": employee.document,
+    "email": employee.email,
+    "role": employee.role,
+    "telephone": employee.telephone,
+    "access": employee.access,
+  }
+
+  return jsonify(rjson), 200

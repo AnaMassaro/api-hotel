@@ -14,7 +14,7 @@ app.config.from_object('config')
 db.init_app(app)
 migrate = Migrate(app, db)
 
-app.register_blueprint(user_bp, url_prefix='/users')
+app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(employee_bp, url_prefix='/employee')
 
 if __name__ == '__main__':

@@ -9,11 +9,11 @@ class User(db.Model):
   user = db.Column(db.String)
   document = db.Column(db.String, unique=True)
   email = db.Column(db.String)
-  password = db.Column(db.String(8))
+  password = db.Column(db.String(100))
   enabled = db.Column(db.Boolean)
 
 class Employee(db.Model):
-  __tablename__ = 'employee'
+  __tablename__ = 'employees'
 
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String)
@@ -22,5 +22,5 @@ class Employee(db.Model):
   telephone = db.Column(db.String(11))
   role = db.Column(db.String)
   access = db.Column(db.Integer)
-  password = db.Column(db.String(8))
+  password = db.Column(db.String(100))
   enabled = db.Column(db.Boolean)

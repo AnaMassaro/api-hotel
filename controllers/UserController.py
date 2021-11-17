@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from models.models import User
 from flask_sqlalchemy import SQLAlchemy
@@ -15,7 +16,7 @@ def insert():
       user=body['name'], 
       document=body['document'],
       email=body['email'],
-      password=body['password'],
+      password=generate_password_hash(body['password'], method='sha256'),
       enabled=True
     )
 
@@ -40,7 +41,7 @@ def update():
 
     user.user = body['user']
     user.email = body['email']
-    user.password = body['password']
+    user.password = generate_password_hash(body['password'], method='sha256')
 
     db.session.merge(user)
     db.session.commit()
@@ -88,7 +89,6 @@ def list():
         "name": user.user,
         "document": user.document,
         "email": user.email,
-        "password": user.password
       })
   else:
     users = User.query.filter_by(id=id).first()
@@ -97,8 +97,28 @@ def list():
       "name": users.user,
       "document": users.document,
       "email": users.email,
-      "password": users.password
     })
 
   return jsonify(rjson), 200
+
+def login():
+  body = request.json
+
+  email = body['email']
+  password = body['password']
+
+  user = User.query.filter_by(email=email).first()
+
+  if not user or not check_password_hash(user.password, password):
+    return {"message": "Failed to login"}, 400
+
+  rjson = {
+    "id": user.id,
+    "name": user.user,
+    "document": user.document,
+    "email": user.email,
+  }
+
+  return jsonify(rjson), 200
+
   
