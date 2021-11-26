@@ -24,3 +24,24 @@ class Employee(db.Model):
   access = db.Column(db.Integer)
   password = db.Column(db.String(100))
   enabled = db.Column(db.Boolean)
+
+class Bedroom(db.Model):
+  __tablename__ = 'bedrooms'
+
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.String)
+  description = db.Column(db.String)
+  value = db.Column(db.Float)
+  quality = db.Column(db.Integer)
+  status = db.Column(db.Boolean)
+  enabled = db.Column(db.Boolean)
+
+class Booking(db.Model):
+  __tablename__ = 'bookings'
+
+  id = db.Column(db.Integer, primary_key=True)
+  id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+  id_bedroom = db.Column(db.Integer, db.ForeignKey('bedrooms.id'))
+  start_date = db.Column(db.Date)
+  end_date = db.Column(db.Date)
+  status = db.Column(db.String)

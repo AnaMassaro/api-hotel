@@ -39,20 +39,26 @@ def update():
   try:
     user = User.query.filter_by(id=id).first()
 
-    user.user = body['user']
-    user.email = body['email']
-    user.password = generate_password_hash(body['password'], method='sha256')
+    if 'name' in body:
+      user.user = body['name']
+    if 'email' in body:
+      user.email = body['email']
+    if 'password' in body:
+      user.password = generate_password_hash(body['password'], method='sha256')
 
     db.session.merge(user)
     db.session.commit()
 
-    msg = "success"
-    status = 200
-  except Exception as e:
-    msg = "Failed to update"
-    status = 400
+    rjson = {
+      "id": user.id,
+      "name": user.user,
+      "document": user.document,
+      "email": user.email,
+    }
 
-  return {"message": msg}, status
+    return jsonify(rjson), 200
+  except Exception as e:
+    return {"message": "Failed to update"}, 400
 
 def disable():
   id = request.args.get('id')

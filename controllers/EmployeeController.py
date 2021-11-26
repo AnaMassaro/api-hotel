@@ -41,23 +41,35 @@ def update():
   try:
     employee = Employee.query.filter_by(id=id).first()
 
-    employee.name = body['name']
-    employee.email = body['email']
-    employee.telephone = body['telephone']
-    employee.role = body['role']
-    employee.access = body['access']
-    employee.password = generate_password_hash(body['password'], method='sha256')
+    if 'name' in body:
+      employee.name = body['name']
+    if 'email' in body:
+      employee.email = body['email']
+    if 'password' in body:
+      employee.password = generate_password_hash(body['password'], method='sha256')
+    if 'telephone' in body:
+      employee.telephone = body['telephone']
+    if 'role' in body:
+      employee.role = body['role']
+    if 'access' in body:
+      employee.access = body['access']
 
     db.session.merge(employee)
     db.session.commit()
 
-    msg = "success"
-    status = 200
-  except Exception as e:
-    msg = "Failed to update"
-    status = 400
+    rjson = {
+      "id": employee.id,
+      "name": employee.name,
+      "document": employee.document,
+      "email": employee.email,
+      "role": employee.role,
+      "telephone": employee.telephone,
+      "access": employee.access,
+    }
 
-  return {"message": msg}, status
+    return jsonify(rjson), 200
+  except Exception as e:
+    return {"message": "Failed to update"}, 400
 
 def disable():
   id = request.args.get('id')
