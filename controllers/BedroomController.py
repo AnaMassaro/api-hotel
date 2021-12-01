@@ -28,6 +28,7 @@ def insert():
 
   return {"message": "success"}, 200
 
+'''
 def disable():
   id = request.args.get('id')
 
@@ -49,6 +50,7 @@ def disable():
     status = 400
 
   return {"message": msg}, status
+'''
 
 def update():
   id = request.args.get('id')

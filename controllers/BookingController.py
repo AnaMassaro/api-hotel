@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, jsonify
 from models.models import Booking
+import datetime
 
 db = SQLAlchemy()
 
@@ -65,5 +66,39 @@ def insert():
     db.session.rollback()
     return {"message": "Failed to insert"}, 400
   
+  return jsonify(result), 200
+
+def list():
+  start_date = request.args.get('start_date')
+  end_date = request.args.get('end_date')
+
+  if not start_date or not end_date:
+    return {"message": "Invalid parameters"}, 400
+  
+  result = []
+
+  try:
+    sql = """ 
+      SELECT * FROM bedrooms AS r 
+        WHERE r.id 
+          NOT IN(SELECT b.id_bedroom FROM bookings AS b WHERE 1 = 1
+    """
+    sql += " AND start_date >= '"+start_date+"' AND end_date <= '"+end_date+"');"
+
+    rooms = db.engine.execute(sql)
+    
+    for row in rooms:
+      ap = {
+        "id": row[0],
+        "description": row[1],
+        "value": row[2],
+        "quality": row[3],
+        "name": row[4]
+      }
+      result.append(ap)
+
+  except Exception as e:
+    return {"message": "Failed to list"}, 400
+
   return jsonify(result), 200
 

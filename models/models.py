@@ -33,8 +33,6 @@ class Bedroom(db.Model):
   description = db.Column(db.String)
   value = db.Column(db.Float)
   quality = db.Column(db.Integer)
-  status = db.Column(db.Boolean)
-  enabled = db.Column(db.Boolean)
 
 class Booking(db.Model):
   __tablename__ = 'bookings'
